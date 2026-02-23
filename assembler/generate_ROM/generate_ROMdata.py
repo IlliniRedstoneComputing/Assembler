@@ -10,10 +10,16 @@ def parse_bin(file_path):
 
 # Changes the color of the wool and stained glass blocks in the ROM
 def change_color(ROMregion, color="black"):
+    allowed_colors = ["white","black","brown","light_gray","gray","red","pink","orange","yellow","lime","green","blue","light_blue","cyan","magenta","purple"]
+    if not color in allowed_colors:
+        print(f"Specified color {color} is not part of the allowed colors. The allowed colors are: ")
+        print(",".join(allowed_colors))
+        print("Black will be chosen as default.")
+        color = "black"
     black_wool = BlockState("minecraft:black_wool")
     black_stained_glass = BlockState("minecraft:black_stained_glass")
-    new_wool = BlockState(f"{color}_wool")
-    new_stained_glass = BlockState(f"{color}_stained_glass")
+    new_wool = BlockState(f"minecraft:{color}_wool")
+    new_stained_glass = BlockState(f"minecraft:{color}_stained_glass")
     
     ROMregion.replace(black_wool, new_wool)
     ROMregion.replace(black_stained_glass, new_stained_glass)
