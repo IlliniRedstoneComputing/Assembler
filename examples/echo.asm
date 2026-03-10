@@ -1,4 +1,4 @@
-#include "overture.asm"
+#include "../overture.asm"
 
 ;; to get an input character: copy in, r1
 ;; if the MSB is zero, the character is ready; otherwise, the program should wait until it is ready

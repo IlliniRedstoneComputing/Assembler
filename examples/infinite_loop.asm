@@ -1,4 +1,4 @@
-#include "./overture.asm"
+#include "../overture.asm"
 
 
 ;; Infinite loop that prints periods
