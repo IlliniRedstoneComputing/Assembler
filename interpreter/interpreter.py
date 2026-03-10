@@ -45,17 +45,17 @@ class Interpreter:
 
         match operation:
             case 0b000:
-                self.registers[0] = self.registers[1] | self.registers[2]
+                self.registers[3] = self.registers[1] | self.registers[2]
             case 0b001:
-                self.registers[0] = ~(self.registers[1] & self.registers[2])
+                self.registers[3] = ~(self.registers[1] & self.registers[2])
             case 0b010:
-                self.registers[0] = ~(self.registers[1] | self.registers[2])
+                self.registers[3] = ~(self.registers[1] | self.registers[2])
             case 0b011:
-                self.registers[0] = self.registers[1] & self.registers[2]
+                self.registers[3] = self.registers[1] & self.registers[2]
             case 0b100:
-                self.registers[0] = self.registers[1] + self.registers[2]
+                self.registers[3] = self.registers[1] + self.registers[2]
             case 0b101:
-                self.registers[0] = self.registers[1] - self.registers[2]
+                self.registers[3] = self.registers[1] - self.registers[2]
             case 0b111:
                 self.halted = True
 
