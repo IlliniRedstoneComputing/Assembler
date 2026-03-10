@@ -16,6 +16,9 @@
 }
 
 #ruledef {
+    ;; Simple out macro
+    OUT {src: source} => { asm {copy {src}, out} }
+
     ;; Function return
     RET => {
         asm {
@@ -33,6 +36,7 @@
             L_BRnzp {addr}
         }
     }
+    L_LDC {char} => { asm {L_LD ascii({char})`7} }
 
     ;; Long Load
     L_LD {value: i8} => { ; 1 instruction for (value <= MAX_I6)

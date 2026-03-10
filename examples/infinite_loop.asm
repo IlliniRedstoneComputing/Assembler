@@ -1,11 +1,11 @@
 #include "../overture.asm"
+#include "../macros.asm"
 
 
 ;; Infinite loop that prints periods
+;;  Uses several new macros
 
-    copy r0, out
 loop:
-    load 46
-    copy r0, out
-    load loop
-    BRnzp
+    L_LDC "."
+    OUT r0
+    L_BRnzp loop
