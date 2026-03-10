@@ -15,21 +15,18 @@ poll_loop:
     copy r0, r2             ; Move to ALU
 
     add                     ; Add to get 126 in r0
-    copy r0, r3             ; Move to r3 for compatibility (this is the fix for the ALU putting output in r0)
 
     load 2                  ; 2
     copy r0, r1             ; Move 2 to ALU
     copy r3, r2             ; Move 126 to ALU
 
     add                     ; Add to get 128 in r0
-    copy r0, r3             ; Move 128 to r3 for compatibility (this is the fix for the ALU putting output in r0)
 
     copy r3, r2             ; Move 128 to r2 for and'ing
     
     ;; R2 now contains 128, so we can read input
     copy in, r1             ; Move input to r1
-    and                     ; r0 = r1 & r2, which will be 128 if the MSB is set, and 0 otherwise
-    copy r0, r3             ; Move result to r3 for compatibility (this is the fix for the ALU putting output in r0)
+    and                     ; r3 = r1 & r2, which will be 128 if the MSB is set, and 0 otherwise
     load poll_loop          ; Load the address of the poll loop
     BRn                     ; If the result is negative (MSB is set, and input not ready), we keep polling
     
