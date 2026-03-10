@@ -6,6 +6,5 @@
 ;;  Uses several new macros
 
 loop:
-    L_LDC "."
-    OUT r0
+    OUTC "."
     L_BRnzp loop

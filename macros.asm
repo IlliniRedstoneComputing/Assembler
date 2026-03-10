@@ -15,9 +15,21 @@
     pc + offset
 }
 
+#fn printhelp(string) => {
+    string[7:0]
+}
+
 #ruledef {
     ;; Simple out macro
     OUT {src: source} => { asm {copy {src}, out} }
+
+    ;; Print character macro
+    OUTC {char} => {
+        asm {
+            L_LDC {char}
+            OUT R0
+        }
+    }
 
     ;; Function return
     RET => {
