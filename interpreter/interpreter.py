@@ -5,11 +5,12 @@ from pathlib import Path
 import readchar
 import subprocess
 import shutil
+import array
 
 class Interpreter:
     def __init__(self, data):
         self.data = data
-        self.registers = [0] * 8
+        self.registers = array.array('B', [0] * 8)
         self.pc = 0
         self.halted = False
         self.print_debug = False
@@ -51,20 +52,20 @@ class Interpreter:
             case 0b000:
                 self.registers[3] = self.registers[1] | self.registers[2]
             case 0b001:
-                self.registers[3] = ~(self.registers[1] & self.registers[2])
+                self.registers[3] = (~(self.registers[1] & self.registers[2])) & 0x00FF
             case 0b010:
-                self.registers[3] = ~(self.registers[1] | self.registers[2])
+                self.registers[3] = (~(self.registers[1] | self.registers[2])) & 0x00FF
             case 0b011:
                 self.registers[3] = self.registers[1] & self.registers[2]
             case 0b100:
-                self.registers[3] = self.registers[1] + self.registers[2]
+                self.registers[3] = (self.registers[1] + self.registers[2]) & 0x00FF
             case 0b101:
-                self.registers[3] = self.registers[1] - self.registers[2]
+                self.registers[3] = (self.registers[1] - self.registers[2]) & 0x00FF
             case 0b111:
                 self.halted = True
 
         if self.print_debug:
-            operations = ["OR", "NAND", "NOR", "AND", "ADD", "SUB", "HALT"]
+            operations = ["OR", "NAND", "NOR", "AND", "ADD", "SUB", "?", "HALT"]
             print(f"[DEBUG-CALC] PC: {self.pc:02x} | Instruction: {instr:08b} | Registers: {[f'{r:02x}' for r in self.registers]}. Operation: {operations[operation]}, Result: {self.registers[3]:08b}")
         
         return
@@ -78,7 +79,8 @@ class Interpreter:
             print(f"[DEBUG-COPY] PC: {self.pc:02x} | Instruction: {instr:08b} | Registers: {[f'{r:02x}' for r in self.registers]}. Src: {'r'+str(src) if src < 7 else 'in'}, Dst: {'r'+str(dst) if dst < 7 else 'out'}, Data: {src_data:08b}")
 
         if dst == 0b111:
-            print(chr(self.registers[src]), end="\n" if self.print_debug else "", flush=True)
+            print(chr(src_data), end="\n" if self.print_debug else "", flush=True)
+            self.registers[7] = src_data
             
             return
         
@@ -98,21 +100,21 @@ class Interpreter:
         branch_address = self.registers[0]
         condition = instr & 0b00000111
         data = self.registers[3]
-        
-        if self.print_debug:
-            print(f"[DEBUG-JUMP] PC: {self.pc:02x} | Instruction: {instr:08b} | Registers: {[f'{r:02x}' for r in self.registers]}. Condition: {condition:03b}, Data: {data:08b}, Goto: {branch_address:03b}, Jumped: {self.pc == self.registers[0]}")
     
         condition_met = False
 
-        is_negative = data & 0b10000000 != 0
-        is_zero = data == 0
-        is_positive = not is_negative and not is_zero
+        is_negative = (data & 0b10000000 != 0)
+        is_zero = (data == 0)
+        is_positive = (not is_negative and not is_zero)
         if condition & 0b100:
             condition_met |= is_negative
         if condition & 0b010:
             condition_met |= is_zero
         if condition & 0b001:
             condition_met |= is_positive
+
+        if self.print_debug:
+            print(f"[DEBUG-JUMP] PC: {self.pc:02x} | Instruction: {instr:08b} | Registers: {[f'{r:02x}' for r in self.registers]}. Condition: {condition:03b}, Data: {data:08b}, Goto: {branch_address:03b}, Jumped: {condition_met}")
 
         if condition_met:
             self.pc = branch_address
@@ -129,8 +131,11 @@ def main():
     
     if file_path.endswith(".asm"):
         customasm_path = shutil.which("customasm.exe")
-        data = subprocess.run([customasm_path, file_path, "-f", "hexcomma", "-q", "-p"], stderr=subprocess.STDOUT, shell=False, check=False, stdout=subprocess.PIPE).stdout
-        data = b''.join([int(str(byte).replace("'", "").replace("\\n","").replace("0x","")[1:],16).to_bytes(1) for byte in data.split(b', ')])
+
+        customasm_call = subprocess.run([customasm_path, file_path, "-f", "hexcomma", "-q", "-p"], shell=False, check=False, stdout=subprocess.PIPE)
+        if customasm_call.returncode != 0:
+            return 1
+        data = b''.join([int(str(byte).replace("'", "").replace("\\n","").replace("0x","")[1:],16).to_bytes(1) for byte in customasm_call.stdout.split(b', ')])
     elif not file_path.endswith(".bin"):
         print("File must be .bin\nProgram exited.")
         return 1
