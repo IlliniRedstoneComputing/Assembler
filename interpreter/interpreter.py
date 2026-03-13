@@ -14,9 +14,11 @@ class Interpreter:
         self.pc = 0
         self.halted = False
         self.print_debug = False
+        self.tick = 0
 
     def step(self):
         instr = self.data[self.pc]
+        self.tick += 1
 
         condition_met = False
         match instr >> 6:
@@ -150,7 +152,7 @@ def main():
     if "-D" in argv:
         interpreter.print_debug = True
 
-    while not interpreter.halted:
+    while not interpreter.halted and interpreter.tick < 500:
         try:
             interpreter.step()
         except KeyboardInterrupt as e:

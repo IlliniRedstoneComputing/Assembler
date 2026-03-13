@@ -6,11 +6,11 @@
 #fn get_offset(addr) => {
     naddr_lst = 0xECB81 ; +1 to get actual value
     npc_lst = 0xDDB961
-    naddr = ((naddr_lst >> (((addr-1>0 ? addr-1 : 0)/63)*8)) & 0xF) + 1
-    npc = (npc_lst >> (((pc-1>0 ? pc-1 : 0)/63)*8)) & 0xF
-    npc_next = (npc_lst >> (((pc-1>0 ? pc-1 : 0)/63+1)*8)) & 0xF
+    naddr = ((naddr_lst >> (((addr-1>0 ? addr-1 : 0)/63)*4)) & 0xF) + 1
+    npc = (npc_lst >> (((pc-1>0 ? pc-1 : 0)/63)*4)) & 0xF
+    npc_next = (npc_lst >> (((pc-1>0 ? pc-1 : 0)/63+1)*4)) & 0xF
     simple_total = naddr + npc + 1
-    npc_recalc = (npc_lst >> ((((pc+simple_total)-1>0 ? pc-1 : 0)/63)*8)) & 0xF
+    npc_recalc = (npc_lst >> ((((pc+simple_total)-1>0 ? pc-1 : 0)/63)*4)) & 0xF
     offset = (npc_recalc == npc ? simple_total : naddr + npc_next + 1)
     pc + offset
 }
