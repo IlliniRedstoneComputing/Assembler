@@ -72,6 +72,12 @@ def main():
     data = parse_bin(file_path)
     print(data.hex(sep="\t", bytes_per_sep=1))
     
+    generate_schematic(data, f"{file_name}_ROMdata.litematic", color)
+
+    return 0
+
+
+def generate_schematic(data, file_name, color="black"):
     all_regions = generate_regions(data)
     
     ROM_SCHEMATIC = Path(__file__).resolve().parent / "256_byte_ROM.litematic"
@@ -84,14 +90,14 @@ def main():
     schem.regions["ROM"] = ROMregion
     schem.regions.pop("Unnamed")
     
-    print(schem.regions)
+    # print(schem.regions)
     for name,region in all_regions.items():
         schem.regions[name] = region
-    #schem = Schematic(name=f"{file_name}_ROM", author="AMcD", description="ROM data generated from binary file", regions=all_regions)
     
     # Save the schematic
-    schem.save(f"{path.splitext(file_path)[0]}_ROMdata.litematic")
-    return 0
+    schem.save(f"{file_name}")
+
+
 
 if __name__ == "__main__":
     main()
